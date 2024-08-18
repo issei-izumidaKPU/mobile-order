@@ -1,0 +1,5 @@
+# ※利用上の注意点
+GoogleAppsScriptを使用してこのコードを書いているため、
+https://docs.google.com/spreadsheets/d/1CrpAltWU0Yfl4g3248_seoD_1HNzQJ-CS2N82Mu_29Q/edit?usp=sharing  
+から拡張機能のAppsScriptでこのコードを使ってください。  
+また、コード内でSheetDBを使ってスプレッドシートの内容を取得していますが、このAPIのリンクだとすでに制限がかかってしまっていて、注文一覧が表示されなくなっていますので、個別でSheetDBにこのスプレッドシートのリンクを登録して、そのAPIを利用してください。
