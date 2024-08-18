@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+h2, h3 {
+  color: #2c3e50;
+  font-size: 2.5em;
+  text-align: center;
+}
+
+form {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+input[type="number"], select {
+  font-size: 1.5em;
+  padding: 10px;
+  margin: 10px 0;
+  width: 100%;
+  max-width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+button {
+  font-size: 1.5em;
+  background-color: #3498db;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+#totalPrice {
+  font-size: 2em;
+  margin-top: 20px;
+}
+
+#loading {
+  font-size: 1.5em;
+  color: #e74c3c;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+  <h2>注文一覧</h2>
+  <div id="orderList"></div>
+
+  <script>
+    async function loadOrders() {
+      try {
+        const response = await fetch('https://sheetdb.io/api/v1/chabb97g1zvj1');
+        const data = await response.json();
+        console.log('Data received:', data);
+
+        const orderList = document.getElementById('orderList');
+        orderList.innerHTML = '';
+
+        if (!data || data.length === 0) {
+          orderList.innerHTML = '<p>現在、注文はありません。</p>';
+        } else {
+          data.forEach(order => {
+            const orderHtml = `
+              <div>
+                <p><strong>注文時刻:</strong> ${order['注文時刻']}</p>
+                <p><strong>メール:</strong> ${order['注文者メールアドレス']}</p>
+                <p><strong>商品:</strong> ${order['商品名']}</p>
+                <p><strong>数量:</strong> ${order['数量']}</p>
+              </div><hr>`;
+            orderList.innerHTML += orderHtml;
+          });
+        }
+      } catch (error) {
+        console.error('Error loading orders:', error);
+        document.getElementById('orderList').innerHTML = '注文の取得に失敗しました。';
+      }
+    }
+
+
+    window.onload = function() {
+      loadOrders();
+      setInterval(loadOrders, 5000); // 5秒ごとに注文リストを更新
+    };
+  </script>
+</body>
+</html>

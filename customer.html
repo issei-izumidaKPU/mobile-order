@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    #loading {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      font-size: 1.5em;
+      color: #e74c3c;
+      text-align: center;
+    }
+    body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+h2, h3 {
+  color: #2c3e50;
+  font-size: 2.5em;
+  text-align: center;
+}
+
+form {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+input[type="number"], select {
+  font-size: 1.5em;
+  padding: 10px;
+  margin: 10px 0;
+  width: 100%;
+  max-width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+button {
+  font-size: 1.5em;
+  background-color: #3498db;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+#totalPrice {
+  font-size: 2em;
+  margin-top: 20px;
+}
+
+  </style>
+</head>
+<body>
+  <h3>商品を選択してください</h3>
+  <form id="orderForm">
+    商品名: 
+    <select id="itemName" onchange="calculateTotal()">
+      <option value="たこ焼き">たこ焼き</option>
+      <option value="焼きそば">焼きそば</option>
+      <option value="お好み焼き">お好み焼き</option>
+      <option value="ソフトドリンク">ソフトドリンク</option>
+    </select><br>
+    数量: <input type="number" id="quantity" min="1" value="1" oninput="calculateTotal()"><br>
+    <p id="totalPrice">合計金額: 500 円</p>
+    <button type="button" onclick="submitOrder()">注文</button>
+  </form>
+
+  <div id="loading" style="display:none;">注文中...</div>
+
+  <script>
+    const prices = {
+      "たこ焼き": 500,
+      "焼きそば": 400,
+      "お好み焼き": 600,
+      "ソフトドリンク": 200
+    };
+
+    function calculateTotal() {
+      const itemName = document.getElementById('itemName').value;
+      const quantity = document.getElementById('quantity').value;
+      const total = prices[itemName] * quantity;
+      document.getElementById('totalPrice').innerText = `合計金額: ${total} 円`;
+    }
+
+    function submitOrder() {
+      const itemName = document.getElementById('itemName').value;
+      const quantity = document.getElementById('quantity').value;
+      const totalAmount = prices[itemName] * quantity;
+      document.getElementById('loading').style.display = 'block'; // ロード中の表示
+
+      google.script.run
+        .withSuccessHandler(function(userEmail) {
+          const orderData = {
+            'itemName': itemName,
+            'quantity': quantity,
+            'totalAmount': totalAmount,
+            'userEmail': userEmail  // 取得したメールアドレスをorderDataに追加
+          };
+
+          google.script.run
+            .withSuccessHandler(function(result) {
+              document.getElementById('loading').style.display = 'none'; // ロード中の表示を非表示
+              alert('注文が確定しました');
+              calculateTotal(); // 合計金額を再計算
+            })
+            .placeOrder(orderData);
+        })
+        .getUserEmail(); // Google Apps Script の getUserEmail 関数を呼び出す
+    }
+
+    window.onload = calculateTotal;
+  </script>
+</body>
+</html>
